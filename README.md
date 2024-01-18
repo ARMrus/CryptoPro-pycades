@@ -39,7 +39,7 @@
 Запустить:
 
 ```
-docker build --tag cryptopro_5 .
+docker build --tag armrus/cryptopro-pycades:latest .
 ```
 
 ## Возможные проблемы
@@ -293,7 +293,7 @@ curl -sS -X POST --data-binary "bindata" http://localhost:8095/healthchecks
 
 ```shell
 curl -X 'GET' \
-  'http://localhost:8001/certificate' \
+  'http://localhost:8095/certificate' \
   -H 'accept: application/json'
 ```
 
@@ -356,7 +356,7 @@ curl -X 'GET' \
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/certificate/root' \
+  'http://localhost:8095/certificate/root' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@filename.p7b;type=application/x-pkcs7-certificates'
@@ -379,7 +379,7 @@ curl -X 'POST' \
 С пин-кодом:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/certificate/private_key?pin=1234' \
+  'http://localhost:8095/certificate/private_key?pin=1234' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@bundle-pin.zip;type=application/zip'
@@ -387,7 +387,7 @@ curl -X 'POST' \
 Без пин-кодом:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/certificate/private_key' \
+  'http://localhost:8095/certificate/private_key' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@bundle-no-pin.zip;type=application/zip'
@@ -398,19 +398,19 @@ curl -X 'POST' \
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/license?serial_number=12345-12345-12345-12345-12345' \
+  'http://localhost:8095/license?serial_number=12345-12345-12345-12345-12345' \
   -H 'accept: application/json' \
   -d ''
 ```
 
-## `/signer` - подписание документов
+## `/signer` - подписание документов, прикрепленная подпись (возращает, новый подписанный файл с документом)
 
 Для подписания нужно передать файл в сервис.
 
 С пин-кодом:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/signer?pin=123' \
+  'http://localhost:8095/signer?pin=123' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@filename.pdf;type=application/pdf'
@@ -419,7 +419,31 @@ curl -X 'POST' \
 Без пин-кода:
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/signer' \
+  'http://localhost:8095/signer' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@filename.pdf;type=application/pdf'
+```
+
+Вернется `JSON` - документ, в `signedContent` будет содержаться подписанный файл и в `filename` новое имя файла.
+
+## `/separate_signer` - подписание документов, открепленная подпись (возвращает только файл с подписью)
+
+Для подписания нужно передать файл в сервис.
+
+С пин-кодом:
+```shell
+curl -X 'POST' \
+  'http://localhost:8095/signer?pin=123' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@filename.pdf;type=application/pdf'
+```
+
+Без пин-кода:
+```shell
+curl -X 'POST' \
+  'http://localhost:8095/signer' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@filename.pdf;type=application/pdf'
@@ -433,7 +457,7 @@ curl -X 'POST' \
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/verify' \
+  'http://localhost:8095/verify' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'original_file=@filename1.pdf;type=application/pdf' \
@@ -449,7 +473,7 @@ curl -X 'POST' \
 
 ```shell
 curl -X 'POST' \
-  'http://localhost:8001/unsigner' \
+  'http://localhost:8095/unsigner' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@filename.sig;type=application/sig'
@@ -458,6 +482,7 @@ curl -X 'POST' \
 
 # Ссылки
 
+* [Исходный репозиторий](https://github.com/devind-team/CryptoPro-pycades)
 * [Страница расширения для Python](https://docs.cryptopro.ru/cades/pycades)
 * [Тестовый УЦ](http://testca2012.cryptopro.ru/ui/), его сертификаты: [корневой](http://testca2012.cryptopro.ru/cert/rootca.cer), [промежуточный](http://testca2012.cryptopro.ru/cert/subca.cer)
 
@@ -470,4 +495,3 @@ curl -X 'POST' \
 * [CryptoProCSP](https://github.com/taigasys/CryptoProCSP), он классный, но:
   * давно не обновлялся, используется версия `PHP5.6`
   * для запуска пришлось подредактировать `Dockerfile`
-

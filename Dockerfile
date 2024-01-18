@@ -1,7 +1,7 @@
 FROM python:3.10.6 AS build
 
-LABEL developer="Miloslavskiy Sergey"
-LABEL maintainer="MiloslavskiySergey@yandex.ru"
+LABEL developer="armrus.org"
+LABEL maintainer="armrus@armrus.org"
 
 # Installing required build packages
 RUN set -ex && \
@@ -41,7 +41,7 @@ RUN set -ex && \
 RUN set -ex && \
     curl -O https://cryptopro.ru/sites/default/files/products/cades/current_release_2_0/cades-linux-amd64.tar.gz && \
     mkdir ./cades-linux-amd64 && \
-    tar xvf cades-linux-amd64.tar.gz -C ./cades-linux-amd64 && \
+    tar xvf cades-linux-amd64.tar.gz && \
     apt-get install ./cades-linux-amd64/cprocsp-pki-cades-*amd64.deb
 
 # Download and extract the pycades source archive

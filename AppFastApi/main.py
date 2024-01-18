@@ -89,6 +89,26 @@ async def signer_file(file: UploadFile = File(...), pin: Optional[str] = None):
                                  })
 
 
+@app.post('/separate_signer')
+async def signer_file(file: UploadFile = File(...), pin: Optional[str] = None):
+    if pin:
+        signer = await signature_data_pin(pin)
+    else:
+        signer = await signature_data()
+    hashedData = pycades.HashedData()
+    hashedData.DataEncoding = pycades.CADESCOM_BASE64_TO_BINARY
+    data = file.read()
+    if isinstance(data, str):
+        data = bytes(data.encode(encoding))
+    hashedData.Algorithm = pycades.CADESCOM_HASH_ALGORITHM_CP_GOST_3411_2012_256
+    hashedData.Hash(base64.b64encode(await data).decode())
+    signed_data = pycades.SignedData()
+    signature = signed_data.SignHash(hashedData, signer, pycades.CADESCOM_CADES_BES)
+    return JSONResponse(content={'signedContent': signature,
+                                 'filename': f'{file.filename}.sig'
+                                 })
+
+
 @app.post('/unsigner')
 async def unsigner_file(file: UploadFile = File(...)):
     _signedData = pycades.SignedData()
